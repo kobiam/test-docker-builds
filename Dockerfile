@@ -1,20 +1,5 @@
-FROM ruby:2.3-slim
-
-RUN apt-get update && apt-get install -qq -y build-essential nodejs libpq-dev postgresql-client-9.4 --fix-missing --no-install-recommends
-
-ENV INSTALL_PATH /mobydock
-RUN mkdir -p $INSTALL_PATH
-
-WORKDIR $INSTALL_PATH
-
-COPY Gemfile Gemfile
-RUN bundle install
-
-COPY . .
-
-RUN bundle exec rake RAILS_ENV=production DATABASE_URL=postgresql://user:pass@127.0.0.1/dbname SECRET_TOKEN=pickasecuretoken assets:precompile
-
-VOLUME ["$INSTALL_PATH/public"]
-
-CMD bundle exec unicorn -c config/unicorn.rb
-
+FROM jenkinsci/jenkins:2.75-alpine
+RUN curl -fsSLO https://get.docker.com/builds/Linux/x86_64/docker-17.04.0-ce.tgz \
+  && tar xzvf docker-17.04.0-ce.tgz \
+  && mv docker/docker /usr/local/bin \
+  && rm -r docker docker-17.04.0-ce.tgz
